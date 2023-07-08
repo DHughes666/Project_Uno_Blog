@@ -54,7 +54,7 @@
           {% for post in posts %}
           <div class="blog-post">
             <h2 class="blog-post-title">
-                <a href="{% url 'blog:post_detail' post.id %}">
+                <a href="{{ post.get_absolute_url }}">
                     {{ post.title }}
                 </a>
             </h2>
@@ -64,12 +64,7 @@
           </div><!-- /.blog-post -->
           {% endfor %}
     
-          
-    
-          <nav class="blog-pagination">
-            <a class="btn btn-outline-primary" href="#">Older</a>
-            <a class="btn btn-outline-secondary disabled">Newer</a>
-          </nav>
+          {% include "pagination.html" with page=posts %}         
     
         </div><!-- /.blog-main -->
     
