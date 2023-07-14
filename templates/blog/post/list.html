@@ -1,4 +1,5 @@
 {% extends "blog/base.html" %}
+{% load blog_tags %}
 {% load static %}
 {% block title %}My Blog{% endblock %}
 
@@ -9,9 +10,16 @@
 <main role="main" class="container">
     <div class="row">
         <div class="col-md-8 blog-main">
+          
           <h3 class="pb-4 mb-4 font-italic border-bottom">
             From the Firehose
           </h3>
+          {% if tag %}
+          <h2 class="pb-4 mb-4 font-italic border-bottom">
+            Posts tagged with "{{ tag.name }}"
+          </h2>
+          {% endif %}
+
           {% for post in posts %}
           <div class="blog-post">
             <h2 class="blog-post-title">
@@ -19,9 +27,17 @@
                     {{ post.title }}
                 </a>
             </h2>
+            <p class="font-italic">Tags: 
+              {% for tag in post.tags.all %}
+              <a href="{% url "blog:post_list_by_tag" tag.slug %}">
+                {{ tag.name }}
+              </a>
+              {% if not forloop.last %}, {% endif %}
+              {% endfor %}
+            </p>
             <p class="blog-post-meta"> {{ post.created }} by {{ post.author }}</p>
                 
-            <p>{{ post.body|truncatewords:30|linebreaks }}</p>
+            <p>{{ post.body|markdown|truncatewords:30 }}</p>
           </div><!-- /.blog-post -->
           {% endfor %}
     
@@ -34,23 +50,32 @@
             <h4 class="font-italic">About</h4>
             <p class="mb-0">Saw you downtown singing the Blues. Watch you circle the drain. Why don't you let me stop by? Heavy is the head that <em>wears the crown</em>. Yes, we make angels cry, raining down on earth from up above.</p>
           </div>
+
+          <div>
+            <p>
+              <a href="{% url "blog:post_feed" %}">
+                Subscribe to my RSS feed
+              </a>
+            </p>
+          </div>
     
           <div class="p-4">
-            <h4 class="font-italic">Archives</h4>
-            <ol class="list-unstyled mb-0">
-              <li><a href="#">March 2014</a></li>
-              <li><a href="#">February 2014</a></li>
-              <li><a href="#">January 2014</a></li>
-              <li><a href="#">December 2013</a></li>
-              <li><a href="#">November 2013</a></li>
-              <li><a href="#">October 2013</a></li>
-              <li><a href="#">September 2013</a></li>
-              <li><a href="#">August 2013</a></li>
-              <li><a href="#">July 2013</a></li>
-              <li><a href="#">June 2013</a></li>
-              <li><a href="#">May 2013</a></li>
-              <li><a href="#">April 2013</a></li>
-            </ol>
+            <h4 class="font-italic">Recent posts</h4>
+            <p class="list-unstyled mb-0">
+              {% show_latest_posts 4 %}
+            </p>
+          </div>
+
+          <div class="p-4">
+            <h4 class="font-italic">Most commented posts</h4>
+            {% get_most_commented_posts as most_commented_posts %}
+            <ul>
+              {% for post in most_commented_posts %}
+              <li>
+                <a href="{{ post.get_absolute_url }}">{{ post.title }}</a>
+              </li>
+              {% endfor %}
+            </ul>
           </div>
     
           <div class="p-4">
